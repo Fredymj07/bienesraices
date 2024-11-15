@@ -1,6 +1,6 @@
 name: test-integration.yml
 on:
-  push:
+  pull_request:
     branches:
       - staging
       - master
