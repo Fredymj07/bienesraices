@@ -26,4 +26,4 @@ jobs:
 
       # Paso 4: Ejecutar eslint
       - name: Run ESLint
-        run: npx eslint . --ext .js,.ts
+        run: npx eslint .
