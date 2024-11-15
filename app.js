@@ -1,16 +1,15 @@
 import express from 'express';
+import userRoutes from './routes/userRoutes.js';
 
 /* Instanciación de la aplicación */
 const app = express();
 
-/* Routing de la aplicación */
-app.get('/', function(req, res) {
-    res.send('Hello World using Express.')
-});
+/* Routing */
+app.use('/auth', userRoutes);
 
-app.get('/nosotros', function(req, res) {
-    res.send('Information about us.')
-});
+/* Habilitar Pug para Template Engine */
+app.set('view engine', 'pug');
+app.set('views', './views');
 
 /* Definición del puerto del servidor y arranque de la aplicación */
 const port = 3000;

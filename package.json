@@ -28,7 +28,8 @@
   },
   "homepage": "https://github.com/Fredymj07/bienesraices_mvc#readme",
   "dependencies": {
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "pug": "^3.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
