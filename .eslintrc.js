@@ -12,6 +12,16 @@ export default {
       ecmaVersion: 'latest',
       sourceType: 'module',
     },
+    overrides: [
+      {
+        files: ['*.js', '*.ts'],
+        // Configuración específica para archivos .js y .ts
+        parserOptions: {
+          ecmaVersion: 2020,
+          sourceType: 'module',
+        },
+      },
+    ],
     rules: {
       'no-console': 'off',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
