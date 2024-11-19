@@ -11,13 +11,17 @@ const __dirname = path.dirname(__filename);
 /* Instanciación de la aplicación */
 const app = express();
 
- /* Conexión con la base de datos */
- try {
-    await db.authenticate();
-    console.log('Connection succesfull to Database!!!');
- } catch (error) {
-    console.log(error);
- }
+/* Conexión con la base de datos */
+try {
+   await db.authenticate();
+   db.sync();
+   console.log('Connection succesfull to Database!!!');
+} catch (error) {
+   console.log(error);
+}
+
+/* Habilitar lectura de datos ingresados en formularios */
+app.use( express.urlencoded({extended: true}) );
 
 /* Configuración del directorio de archivos estáticos */
 app.use(express.static(path.join(__dirname, 'public')));
