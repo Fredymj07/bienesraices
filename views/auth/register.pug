@@ -14,6 +14,7 @@ block content
         div.mt-8.mx-auto.max-w-md
             .bg-white.py-8.px-4.shadow
                 form.space-y-3(method="POST" action="/auth/register" noValidate)
+                    input(type="hidden" name="_csrf" value= csrfToken)
                     div
                         label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="name") Nombre
                         input#name.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-300(placeholder="Nombre" type="text" name="name" value=user ? user.name : "")
@@ -27,7 +28,7 @@ block content
                         label.block.text-sm.uppercase.text-gray-600.mb-2.font-bold(for="repeat_password") Repetir contraseña
                         input#repeat_password.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-300(type="password" name="repeat_password")
 
-                    input(class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 cursor-pointer" type="submit", value="Crear Cuenta")
+                    input(class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 cursor-pointer rounded" type="submit", value="Crear Cuenta")
 
                     div.flex.items-center.justify-between
                         a.text-gray-500.text-xs(href="/auth/login") Iniciar sesión 

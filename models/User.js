@@ -18,6 +18,7 @@ const user = db.define('users', {
     token: DataTypes.STRING,
     confirmed: DataTypes.BOOLEAN
 }, {
+    // Encripción de la contraseña ingresada por el usuario
     hooks: {
         beforeCreate: async function(user) {
             const salt = await bcrypt.genSalt(10);
