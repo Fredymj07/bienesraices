@@ -1,4 +1,6 @@
 import express from 'express';
+import csrf from 'csurf';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import userRoutes from './routes/userRoutes.js';
@@ -11,6 +13,15 @@ const __dirname = path.dirname(__filename);
 /* Instanciación de la aplicación */
 const app = express();
 
+/* Habilitar lectura de datos ingresados en formularios */
+app.use( express.urlencoded({extended: true}) );
+
+/* Habilitar cookie parser para la activación de CSRF */
+app.use( cookieParser() );
+
+/* Habilitar csurf para la seguridad en los formularios de la aplicación */
+app.use( csrf({cookie: true}) );
+
 /* Conexión con la base de datos */
 try {
    await db.authenticate();
@@ -19,9 +30,6 @@ try {
 } catch (error) {
    console.log(error);
 }
-
-/* Habilitar lectura de datos ingresados en formularios */
-app.use( express.urlencoded({extended: true}) );
 
 /* Configuración del directorio de archivos estáticos */
 app.use(express.static(path.join(__dirname, 'public')));
@@ -34,7 +42,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/auth', userRoutes);
 
 /* Definición del puerto del servidor y arranque de la aplicación */
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
