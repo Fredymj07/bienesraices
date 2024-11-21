@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import Sequelize from "sequelize";
 import dotenv from 'dotenv';
 dotenv.config({path: '.env'});
