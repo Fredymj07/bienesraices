@@ -1,7 +1,6 @@
 import express from 'express';
 import { 
     formLogin,
-    authenticateUser,
     formRegister,
     createAccount,
     accountVerification,
@@ -17,7 +16,6 @@ const router = express.Router();
  * Definición de las rutas de la aplicación
  */
 router.get('/login', formLogin);
-router.post('/login', authenticateUser);
 
 router.get('/register', formRegister);
 router.post('/register', createAccount);

@@ -15,10 +15,6 @@ const formLogin = (req, res) => {
     });
 }
 
-const authenticateUser = (req, res) => {
-    
-}
-
 /**
  * Método que permite mostrar el formulario para el registro de usuarios
  * @param {*} req 
@@ -315,7 +311,6 @@ const assignNewPassword = async (req, res) => {
 
 export {
     formLogin,
-    authenticateUser,
     formRegister,
     createAccount,
     accountVerification,
