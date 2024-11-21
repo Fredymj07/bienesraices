@@ -5,7 +5,9 @@ import {
     createAccount,
     accountVerification,
     formForgotPassword,
-    resetPassword
+    resetPassword,
+    verifyTokenToResetPassword,
+    assignNewPassword
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -17,9 +19,12 @@ router.get('/login', formLogin);
 
 router.get('/register', formRegister);
 router.post('/register', createAccount);
+
 router.get('/mail-confirmation/:token', accountVerification);
 
 router.get('/forgot-password', formForgotPassword);
-router.get('/reset-password', resetPassword);
+router.post('/forgot-password', resetPassword);
+router.get('/forgot-password/:token', verifyTokenToResetPassword);
+router.post('/forgot-password/:token', assignNewPassword);
 
 export default router;
