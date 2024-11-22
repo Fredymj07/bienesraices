@@ -16,6 +16,14 @@ const formLogin = (req, res) => {
     });
 }
 
+
+/**
+ * Este método permite realizar las validaciones de las credenciales del usuario
+ * y una vez autenticado, se genera un token válido que se almacena en cookies del navegador
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const authenticateUser = async (req, res) => {
     try {
         // Validación de los datos ingresados en el formulario
