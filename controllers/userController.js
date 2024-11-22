@@ -1,7 +1,7 @@
 import { check, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
-import { generateId } from '../helpers/userTokens.js';
+import { generateJWT, generateUserToken } from '../helpers/userTokens.js';
 import { accountConfirmationEmail, forgotPasswordEmail } from '../helpers/emails.js';
 
 /**
@@ -11,8 +11,73 @@ import { accountConfirmationEmail, forgotPasswordEmail } from '../helpers/emails
  */
 const formLogin = (req, res) => {
     res.render('auth/login', {
-        page: 'Iniciar sesión'
+        page: 'Iniciar sesión',
+        csrfToken: req.csrfToken()
     });
+}
+
+const authenticateUser = async (req, res) => {
+    try {
+        // Validación de los datos ingresados en el formulario
+        await check('email')
+            .notEmpty()
+            .withMessage('El email no puede estar vacío')
+            .run(req);
+        await check('password')
+            .notEmpty()
+            .withMessage('La contraseña no puede estar vacía')
+            .run(req);
+        
+        // Validación del resultado de las validaciones de los campos ingresados
+        let result = validationResult(req);
+        
+        if (!result.isEmpty()) {
+            return res.render('auth/login', {
+                page: 'Iniciar sesión',
+                csrfToken: req.csrfToken(),
+                errors: result.array()
+            });
+        }
+
+        // Validación de la existencia del usuario en la base de datos
+        const { email, password } = req.body;
+        const user = await User.findOne({ where: { email }});
+
+        if (!user) {
+            return res.render('auth/login', {
+                page: 'Iniciar sesión',
+                csrfToken: req.csrfToken(),
+                errors: [{msg: 'El email ingresado no se encuentra registrado. Intenta nuevamente.'}]
+            });
+        }
+
+        // Comprobación de la confirmación de la cuenta
+        if (!user.confirmed) {
+            return res.render('auth/login', {
+                page: 'Iniciar sesión',
+                csrfToken: req.csrfToken(),
+                errors: [{msg: 'La cuenta no ha sido confirmada. Por favor confirma la cuenta para poder continuar.'}]
+            });
+        }
+
+        // Comprobación de la contraseña ingresada por el usuario
+        if (!user.verifyPassword(password)) {
+            return res.render('auth/login', {
+                page: 'Iniciar sesión',
+                csrfToken: req.csrfToken(),
+                errors: [{msg: 'La contraseña ingresada es incorrecta. Por favor intenta nuevamente.'}]
+            });
+        }
+
+        // Generar el jwt y almacenarlo en una cookie del navegador
+        const jwtToken = generateJWT({ id: user.id, name: user.name });
+        return res.cookie('_jwtToken', jwtToken, {
+            httpOnly: true // Este parámetro permite evitar ataques Cross Site Forgery
+        }).redirect('/my-properties');
+
+    } catch (error) {
+        console.error('Error al iniciar sesión con las credenciales suministradas:', error);
+    }
 }
 
 /**
@@ -36,8 +101,17 @@ const formRegister = (req, res) => {
 const createAccount = async (req, res) => {
     try{
         // Validación de los datos ingresados en el formulario
-        await check('name').notEmpty().withMessage('El nombre es un campo requerido').run(req);
-        await check('email').isEmail().withMessage('El valor ingresado no corresponde a un email').run(req);
+        await check('name')
+            .notEmpty()
+            .withMessage('El nombre es un campo requerido')
+            .run(req);
+        await check('email')
+            .notEmpty()
+            .withMessage('El email no puede estar vacío')
+            .bail() // Detiene la ejecución de validaciones adicionales si falla esta
+            .isEmail()
+            .withMessage('El valor ingresado no corresponde con un email válido')
+            .run(req);
         await check('password')
             .notEmpty()
             .withMessage('La contraseña no puede estar vacía')
@@ -54,9 +128,9 @@ const createAccount = async (req, res) => {
             })
             .run(req);
         
-        let result = validationResult(req);
-
         // Validación del resultado de las validaciones de los campos ingresados
+        let result = validationResult(req);
+        
         if (!result.isEmpty()) {
             return res.render('auth/register', {
                 page: 'Crear cuenta',
@@ -92,7 +166,7 @@ const createAccount = async (req, res) => {
             name,
             email,
             password,
-            token: generateId()
+            token: generateUserToken()
         });
 
         // Definición de datos que serán enviados en el email al usuario
@@ -109,16 +183,7 @@ const createAccount = async (req, res) => {
         });
     } catch(error) {
         console.error('Error al crear el usuario:', error);
-        return res.render('auth/register', {
-            page: 'Crear cuenta',
-            errors: [{ msg: 'Ocurrió un error al registrar al usuario. Inténtalo de nuevo.' }],
-            user: {
-                name: req.body.name,
-                email: req.body.email
-            }
-        });
-    }
-    
+    }    
 }
 
 /**
@@ -136,7 +201,7 @@ const accountVerification = async (req, res) => {
 
         // Redireccionar al usuario y mostrar un mensaje cuando no existe el token
         if (!user) {
-            return res.render('auth/message-confirmation', {
+            return res.render('auth/confirmation-message', {
                 page: 'Error en confirmación de cuenta',
                 error: true,
                 message: 'Lo sentimos!!! <br>No ha sido posible realizar la confirmación de la cuenta. Intenta nuevamente.'
@@ -204,7 +269,7 @@ const resetPassword = async (req, res) => {
         }
 
         // Generación de token para el envío del email y actualización de la contraseña
-        user.token = generateId();
+        user.token = generateUserToken();
         await user.save();
 
         // Definición de datos que serán enviados en el email al usuario
@@ -311,6 +376,7 @@ const assignNewPassword = async (req, res) => {
 
 export {
     formLogin,
+    authenticateUser,
     formRegister,
     createAccount,
     accountVerification,
