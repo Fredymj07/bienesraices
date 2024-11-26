@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import userRoutes from './routes/userRoutes.js';
+import propertyRoutes from './routes/propertyRoutes.js';
 import db from './config/db.js';
 
 /* Obtener el nombre de archivo actual y el directorio actual */
@@ -41,6 +42,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 /* Routing */
 app.use('/auth', userRoutes);
+app.use('/', propertyRoutes);
 
 /* Definición del puerto del servidor y arranque de la aplicación */
 const port = process.env.PORT || 3000;

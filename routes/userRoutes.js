@@ -1,5 +1,5 @@
 import express from 'express';
-import { 
+import {
     formLogin,
     authenticateUser,
     formRegister,
@@ -14,7 +14,7 @@ import {
 const router = express.Router();
 
 /**
- * Definición de las rutas de la aplicación
+ * Definición de las rutas correspondientes a AUTH
  */
 router.get('/login', formLogin);
 router.post('/login', authenticateUser);
